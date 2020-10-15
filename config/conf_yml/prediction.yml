@@ -1,0 +1,165 @@
+predictor:
+  xgb:
+    pred_col: pred_xgb
+    hyperparameters:
+      boosting_type: gbdt
+      colsample_bytree: 0.9
+      feature_fraction: 0.5
+      importance_type: split
+      learning_rate: 0.05
+      metric: mape
+      min_child_samples: 20
+      min_child_weight: 0.1
+      min_data_in_leaf: 100
+      gamma: 0.1
+      n_estimators: 300
+      max_depth: 8
+      n_jobs: -1
+      num_leaves: 40
+      reg_lambda: 0.1
+      subsample: 0.9
+      subsample_for_bin: 200000
+      subsample_freq: 0
+
+monotonicity_constraints:
+  m6_nominal_depth: 1
+  edv_depth: 1
+  m6_must_buy_qty: -1
+  edv_mb: -1
+
+
+prediction_schema:
+  horizon: 8 # expressed in weeks, time between forecast and first week of calendar
+  uncontrollable_features:
+    cos_week: float
+    cos_month: float
+    av_sales_4_weeks: float
+    av_sales_8_weeks: float
+    av_sales_12_weeks: float
+    av_sales_16_weeks: float
+    av_sales_20_weeks: float
+    av_sales_24_weeks: float
+    av_sales_28_weeks: float
+    av_sales_by_ppg_4_weeks: float
+    av_sales_by_ppg_8_weeks: float
+    av_sales_by_ppg_12_weeks: float
+    av_sales_by_ppg_16_weeks: float
+    av_sales_by_ppg_20_weeks: float
+    av_sales_by_ppg_24_weeks: float
+    av_sales_by_ppg_28_weeks: float
+    av_sales_by_line_4_weeks: float
+    av_sales_by_line_8_weeks: float
+    av_sales_by_line_12_weeks: float
+    av_sales_by_line_16_weeks: float
+    av_sales_by_line_20_weeks: float
+    av_sales_by_line_24_weeks: float
+    av_sales_by_line_28_weeks: float
+    weighted_holiday_flag: float
+#    holiday_flag: bool
+    avg_discnt_own_1CT2L: float
+    avg_discnt_own_10CT7.5OZ: float
+    avg_discnt_own_12CT12OZ: float
+    avg_discnt_own_24CT12OZ: float
+    avg_discnt_own_6CT16.9OZ: float
+    avg_discnt_own_6CT7.5OZ: float
+    avg_discnt_own_8CT12OZ: float
+    avg_discnt_comp_1CT2L: float
+    avg_discnt_comp_10CT7.5OZ: float
+    avg_discnt_comp_12CT12OZ: float
+    avg_discnt_comp_24CT12OZ: float
+    avg_discnt_comp_6CT16.9OZ: float
+    avg_discnt_comp_6CT7.5OZ: float
+    avg_discnt_comp_8CT12OZ: float
+    regular_price: float
+    is_banner_21: int
+    previous_year_monthly_sales: float
+    is_pepsico: int
+    is_coca_cola: int
+    ratio_num_stores: float
+    min_retailer_comp_avg_price: float
+    diff_retailers_comp_price_percent: float
+    # Not using extrapolation logic for OOS features from etl_extrapolations (which made wmape a lot worse)
+    # and instead training model w/o OOS features gave the highest accuracy
+#    oos_stores: float
+#    oos_missed_units: float
+
+  controllable_features:
+    m6_nominal_depth: float
+    m6_promo_duration: int
+    m6_must_buy_qty: int
+    edv_mb: int
+    edv_depth: float
+    percent_acv_displ_audit: float
+    inventory_per_store_displ: float
+    num_displays: float
+    media_spend_digital: float
+    media_spend_non_digital: float
+
+  target:
+    units: float
+  prediction_column:
+    pred_xgb: float
+  product_key:
+    sku_id: str
+  date_key:
+    predict_dt: str
+  product_information: {} #uon: str
+
+routine:
+  backtest:
+    first_date: 2018-05-01 # Need to be a Wednesday - first date of training data
+    last_date:  2020-03-04 # Need to be a Wednesday - last date in backtest, default latest available #2020-05-22 #2020-03-04
+    n_slices: 3 # number of train-test couples to back-test on
+    calendar_duration: 12 # expressed in weeks, number of weeks to forecast
+    run_name: "precovid_known_forward_looking_feats"
+    export_demand_forecast_input: True
+    export_feature_importance: True
+    export_demand_forecast_output: True
+    export_model_accuracy: True
+  backtest_forward_looking_proxy:
+    list_cols_to_use_proxy: [
+        "media_spend_digital",
+        "media_spend_non_digital",
+        "percent_acv_displ_audit",
+        "inventory_per_store_displ",
+        "num_displays",
+        "ratio_num_stores",
+        "min_retailer_comp_avg_price",
+        "diff_retailers_comp_price_percent",
+    ]
+
+  tuning:
+    last_date: 2020-07-15 # Need to be a Wednesday - last date in backtest, default latest available
+    n_slices: 3 # number of train-test couples to back-test on
+    predictor: xgb
+    options:
+      reg_lambda: [1e-2, 0.1, 1, 10]
+      learning_rate: [0.005,0.01,0.05, 0.1, 0.3, 0.5]
+      n_estimators: [100,200,300, 500, 1000]
+      subsample: [0.5, 0.7, 0.9]
+      colsample_bytree: [0.8, 0.9, 1.0]
+      max_depth: [3,6,8,10,15]
+      min_child_weight: [0.0005, 0.001, 0.01, 0.1,1]
+
+
+rolling_sales_num_weeks:
+  4_weeks: 4
+  8_weeks: 8
+  12_weeks: 12
+  16_weeks: 16
+  20_weeks: 20
+  24_weeks: 24
+  28_weeks: 28
+
+### POSSIBLE FEATURES TO ADD ###
+  # UNCONTROLLABLE FEATURES
+    #    max_temp_week: np.float
+    #    total_snow_week: np.float
+    #    total_rain_week: np.float
+    #    min_temp_week: np.float
+    #    share_OOS: np.float
+    #    trp: np.float
+
+  # CONTROLLABLE FEATURES
+    #    nb_skus_promo: int
+    #    catalogue: int
