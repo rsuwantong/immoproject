@@ -31,7 +31,7 @@ class EtlAgencyMaster(Etl):
                         "reseaux": "network",
                         "teaser-avis": "review_example",
                         "url_pj": "agency_url_pj",
-                        "agence_id": "agency_code"
+                        "agence_id": "image_code"
                         })
 
         return df

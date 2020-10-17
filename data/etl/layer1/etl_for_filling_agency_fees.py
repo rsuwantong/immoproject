@@ -65,6 +65,15 @@ class EtlForFillingAgencyFees(Etl):
             f"There are {num_agencies_final} agencies in for-filling agency fees."
         )
 
+        # Compute agency_code
+        df_for_agency_code = df[["agency_name", "agency_address","postal_code"]].drop_duplicates()
+        df_for_agency_code["pre_agency_code"] = [str(x).zfill(4) for x in df_for_agency_code.groupby(["postal_code"]).cumcount()+1]
+        df_for_agency_code["agency_code"] = df_for_agency_code["postal_code"].astype(str)+df_for_agency_code["pre_agency_code"]
+        df_for_agency_code.drop(columns=["pre_agency_code","postal_code"], inplace=True)
+
+        # Merge agency_code to main dataframe
+        df = df.merge(df_for_agency_code, on=["agency_name", "agency_address"])
+
         df.loc[(df.agency_url=="")|(df.agency_url=="Rejoignez nous sur Facebook"), "agency_url"] = np.nan
         df["agency_url"].fillna(df["agency_url_pj"], inplace=True)
 
@@ -75,7 +84,7 @@ class EtlForFillingAgencyFees(Etl):
                  'agency_name', 'agency_address', 'postal_code', 'city', 'price_min',
                  'agency_rate', 'agency_fee_min_keuros', 'hyperlink_url', 'agency_url',"agency_url_pj", 'telephone',
                  'image_url', 'num_reviews', 'score', 'services', 'network',
-                 'review_example']]
+                 'review_example','image_code']]
 
         # df.to_excel(
         #     os.path.join(
