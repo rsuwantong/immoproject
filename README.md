@@ -1,6 +1,6 @@
 # ImmoProject
 
-Copyright © 2020 by Rata Jacquemart. All rights reserved
+Copyright © 2020 by Rata Jacquemart and Thomas Besnard. All rights reserved
 
 
 
