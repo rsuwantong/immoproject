@@ -1,10 +1,10 @@
-# Kroger NextGen
+# ImmoProject
 
-Copyright © 2020 by Boston Consulting Group. All rights reserved
+Copyright © 2020 by Rata Jacquemart. All rights reserved
 
 
 
-Promo calendar optimization engine for Kroger US
+Applications for agency fee comparison four real estate sellers
 
 
 
@@ -29,7 +29,7 @@ To leverage docker-compose, you have to pass in your SSH key in order to fetch p
 The tool has several entry points through CLI depending on the flow one wants to run. All are structured around a `Routine` object and accept the same arguments. The generic command is the following:
 
 ```
-python -m pep.<module> 
+python -m <module> 
 	--cwd <cwd> 
 	[--routine/-r <routine>] 
 	[--params <params>] 
@@ -65,47 +65,5 @@ For each run, the `Routine` object will create an output folder in the working d
 To update the ETLs and cache the results, run:
 
 ```
-python -m pep.data ...
+python -m data ...
 ```
-
-
-
-### Predictor
-
-To train the predictor and save it as a pickle file, run:
-
-````
-python -m pep.prediction -r training ...
-````
-
-To back-test predictor performance, run:
-
-```
-python -m pep.prediction -r backtest ...
-```
-
-To tune model hyperparameters, run:
-
-```
-python -m pep.prediction -r tuning ...
-```
-
-
-
-### Forward flow
-
-To run the forward flow, run:
-
-`python -m pep.flow ...`
-
-To evaluate a manual calendar, run:
-
-`python -m pep.flow -r evaluation ...`
-
-
-
-### Optimization
-
-To run the optimization, run:
-
-`python -m pep.optim ...`
