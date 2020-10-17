@@ -1,7 +1,8 @@
 cache:
   cache_to_prod: False
   cache_from_prod: False
-  root_local_relative_to_home: "immo_cache"
+  root_prod_relative_to_data_root: "04_outputs/0_data_archive"
+  root_local_relative_to_home: "Documents/04_PERSO/Immo/immo_cache"
   write_kwargs:
     csv:
       sep: "|"
@@ -26,7 +27,26 @@ cache:
         - predict_dt
         - info_dt
 
-list_agence:
+raw_data:
+  agency_master:
+    location: 02_agency_fees/agency_master
+    filename: adresses_all_distinct.csv
+    format: csv
+    read_kwargs:
+      sep: ","
+      usecols: ["agency_name","address","street","postal_code","city"]
+
+  filled_agency_fees:
+    location: 02_agency_fees/filled/75002
+    filename: 20201011_list_agencies_filled_tb_75002.xlsx
+    format: xlsx
+    read_kwargs:
+      usecols: ["comment","is_non-standard","is_agency","tarif_dispo-web","agency_code","agency_name","agency_address","postal_code","city","price_min","agency_rate","agency_fee_min_keuros","hyperlink_url", "agency_url"]
+
+no_update_etls: []
+
+manual_overlay:
+  use: False
   location: 03_external/05_manual_updates
   read_kwargs:
     sep: "|"
@@ -34,189 +54,3 @@ list_agence:
     encoding: utf-8
     dtype:
       sku_id: str
-
-raw_data:
-  sku_master:
-    location: 01_pep/sku
-    filename: Soft Drinks SKU Master.csv
-    format: csv
-    read_kwargs:
-      skiprows: 14
-      dtype:
-        UPC: str
-
-  promo_m6:
-    location: 02_kroger/promo
-    filename: Promotion Evaluation Full Data Report .xlsx
-    format: xlsx
-    read_kwargs:
-      skiprows: 11
-      dtype:
-        ITM_SKU_CD: str
-
-  pep_sales:
-    location: 01_pep/sales/extracts
-    filename: pos_data_4y_by_banner21_35_w_store_distrib_20200907145213.csv
-    format: csv
-    read_kwargs:
-      dtype:
-        sku_id: str
-      parse_dates:
-        - start_promo_week
-        - end_promo_week
-
-  # Todo: investigate how to get these as one file
-  ko_central_sales:
-    location: 02_kroger/sales
-    filename: 07022020_Central_21_UPC_Date_Level_Data_vf.csv
-    format: csv
-    read_kwargs:
-      dtype:
-        UPC Number: str
-
-  ko_dallas_sales:
-    location: 02_kroger/sales
-    filename: 07032020_Dallas_035_UPC_Date_Level_Coca_Cola_Data_vf.xlsx
-    format: xlsx
-    read_kwargs:
-      dtype:
-        UPC Number: str
-
-  kdp_central_sales:
-    location: 02_kroger/sales
-    filename: 07062020_Dr Pepper_Central_21_UPC_Date_Level_Data_vf.xlsx
-    format: xlsx
-    read_kwargs:
-      dtype:
-        UPC Number: str
-
-  kdp_dallas_sales:
-    location: 02_kroger/sales
-    filename: 07072020_Dallas_035_Dr Pepper_UPC_Date_Level_Data_v1.xlsx
-    format: xlsx
-    read_kwargs:
-      dtype:
-        UPC Number: str
-
-  hybrid_edvs:
-    location: 02_kroger/hedv
-    filename: hedvs_on_ppg_tm_level.csv
-    format: csv
-    read_kwargs:
-      dtype:
-        promo_group: str
-
-  holidays:
-    location: 03_external/02_holidays
-    filename: holidays_18_20_v2.csv
-    format: csv
-    read_kwargs:
-      dtype:
-        holiday_flag: bool
-
-  white_prices:
-    location: 02_kroger/white_price
-    filename: white_price_matrix_v4_wide_to_long.csv
-    format: csv
-    read_kwargs:
-      dtype:
-        promo_group: str
-      parse_dates:
-        - predict_dt
-
-  unit_costs:
-    location: 01_pep/financials/entry_price
-    filename: 200826_consolidated_unit_costs.csv
-    format: csv
-    read_kwargs:
-      dtype:
-        Unit cost: float
-
-  no_promo_entry_price:
-    location: 01_pep/financials/entry_price
-    filename: 200826_no_promo_entry_price_df.csv
-    format: csv
-    read_kwargs:
-      dtype:
-        banner: int
-
-  ao_cogs:
-    location: 01_pep/financials/cogs
-    filename: 20200827_banner_ppg_tm_cogs.csv
-    format: csv
-    read_kwargs:
-      dtype:
-        banner: int
-        PPGs per case: int
-
-  shared_adbox_flags:
-    location: 03_external/03_shared_adbox
-    filename: 2018-2020_shared_adbox.csv
-    format: csv
-    read_kwargs:
-      dtype:
-        shared_adbox_flag: bool
-      parse_dates:
-        - predict_dt
-
-  feature_display:
-    location: 02_kroger/promo
-    filename: FD_Data_v2.xlsx
-    format: xlsx
-    read_kwargs:
-      usecols: ["Geography", "Product", "Time", "D_Aud - % ACV (Display Audit)", "D_Aud - Inventory per Display", "D_Aud - Inventory per Store Displaying", "D_Aud - Number of Displays"]
-
-  media_spend:
-    location: 01_pep/marketing
-    filename: media spend by market_formatted_v3.xlsx
-    format: xlsx
-    read_kwargs:
-      sheet_name: "media_spend_by_market_channel"
-
-  out_of_stock:
-    location: 02_kroger/inventory
-    filename: out_of_stock_cleaned_20200925155811.csv
-    format: csv
-    read_kwargs:
-      sep: ";"
-      dtype:
-        sku_id: object
-
-  retailer_competitor_pricing:
-    location: 02_kroger/competitor_pricing
-    filename: "IRI competitor store data_individual RMAs.xlsx"
-    format: xlsx
-    read_kwargs:
-      skiprows: 1
-      usecols: ["Time", "Product", "ABSCO Dallas-RMA - Groc", "Hy-Vee Central Rgn-RMA - Groc", "PBNA Division - Central - Walmart", "PBNA Division - South - Walmart"]
-
-  outlier_promo_flags:
-    location: 03_external/04_outlier_promos
-    filename: outlier_promos_20200925.csv
-    format: csv
-    read_kwargs:
-      dtype:
-        is_outlier: bool
-
-  kdp_vendor:
-    location: 01_pep/sku
-    filename: Copy of Pepsi Truck by Store Report 9.14.20.xlsx
-    format: xlsx
-    read_kwargs: {}
-
-# Static source that should not be updated at each ETL update routine
-# All non-listed ETLs will be updated, alongside all the upstream ETLs they depend on
-no_update_etls: []
-#  - sku_master
-#  - pep_scope
-#  - comp_scope
-#  - ko_central_sales
-#  - ko_dallas_sales
-#  - kdp_central_sales
-#  - kdp_dallas_sales
-#  - comp_sales
-#  - pep_sales_local
-##  - pep_sales
-#  - promo_m6
-#  - pep_promo
-#  - pred_redemption_rate

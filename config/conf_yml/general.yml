@@ -1,0 +1,32 @@
+general:
+  git_commit: #auto-fill
+  timestamp: #auto-fill
+
+  # If this flag is set to true, it means that we just testing the integration
+  # This will disable many constraints
+  integration_tests_only: False
+
+  banner_scope: [21, 35]
+
+  # Empty list for not restrictions on the scope
+  promo_group_scope : [
+    "6 CT 7.5 OZ",
+    "1 CT 2 L",
+    "12 CT 12 OZ",
+    "24 CT 12 OZ",
+    "6 CT 16.9 OZ",
+    "10 CT 7.5 OZ",
+    "8 CT 12 OZ"
+  ]
+
+  mode: local # server or local
+  local_data_root_from_home: "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data/"
+  server_data_root_from_home: "../../work/data"
+  data_root: #autofill
+
+  # Path where data required by optim can be found
+  # Either relative from home, or absolute
+  path_to_optim_input_data: "04_outputs/2_scenario_generation"
+  path_to_optim_output_data: "04_outputs/4_optim"
+
+  concentrate_cogs_factor: 0.204
