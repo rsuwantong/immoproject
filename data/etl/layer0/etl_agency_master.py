@@ -17,17 +17,21 @@ class EtlAgencyMaster(Etl):
     def layer_id(self):
         return 0
 
-    def _process_raw_data(self, df: pd.DataFrame = None):
-        df = df.rename({"adresse": "agency_address",
+    def _process_raw_data(self, raw_df: pd.DataFrame = None):
+        df = raw_df
+        df = df.rename(columns={"adresse": "agency_address",
                         "Code Postal": "postal_code",
                         "Ville": "city",
-                        "agence_url": "agency_url",
+                                "agence_name": "agency_name",
+                        "agence_url_0": "agency_url",
+                                "tel_1": "telephone",
                         "nb_avis": "num_reviews",
                         "note": "score",
-                        "Prestations": "services",
-                        "Reseaux": "network",
+                        "prestations": "services",
+                        "reseaux": "network",
                         "teaser-avis": "review_example",
-                        "agences_urls": "agency_url_pj"
-                        }, inplace=True)
+                        "url_pj": "agency_url_pj",
+                        "agence_id": "agency_code"
+                        })
 
         return df

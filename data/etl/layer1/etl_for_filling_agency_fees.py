@@ -1,7 +1,7 @@
 import pandas as pd
 import os
-from routine.routine import Routine
 from data.etl.etl import Etl
+import numpy as np
 
 
 class EtlForFillingAgencyFees(Etl):
@@ -27,7 +27,8 @@ class EtlForFillingAgencyFees(Etl):
             self._log.warning(
                 f"There are {num_agencies_duplicated} duplicated agencies in agency master."
             )
-            agencies = agencies.drop_duplicates()
+            agencies.loc[(agencies.agency_url == "") | (agencies.agency_url == "Rejoignez nous sur Facebook"), "agency_url"] = np.nan
+            agencies = agencies.sort_values(['agency_name', 'agency_address', 'agency_url', 'agency_url_pj'], ascending=False).groupby(['agency_name', 'agency_address']).head(1)
 
         self._log.info(f"There are {agencies.shape[0]} agencies in agency master.")
 
@@ -35,7 +36,9 @@ class EtlForFillingAgencyFees(Etl):
         self._log.info(
             f"There are {fees[['agency_name', 'agency_address']].drop_duplicates().shape[0]} agencies in filled fees."
         )
-
+        # Get information from agency master for fees
+        fees = fees.merge(agencies, on =["agency_name", "agency_address","postal_code","city","agency_url_pj"], how="left")
+        ## Identify new agencies not in fees
         list_agencies_in_fees = fees[
             ["agency_name", "agency_address"]
         ].drop_duplicates()
@@ -52,7 +55,7 @@ class EtlForFillingAgencyFees(Etl):
         new_agencies_info = pd.concat([new_agencies_info] * 10)
 
         df = fees.merge(
-            new_agencies_info, on=["agency_name", "agency_address"], how="outer"
+            new_agencies_info, how="outer"
         )
         num_agencies_final = (
             df[["agency_name", "agency_address"]].drop_duplicates().shape[0]
@@ -62,38 +65,47 @@ class EtlForFillingAgencyFees(Etl):
             f"There are {num_agencies_final} agencies in for-filling agency fees."
         )
 
-        df.to_excel(
-            os.path.join(
-                "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
-                "02_agency_fees",
-                "for_filling",
-                "for_filling_agencie_fees_"
-                + self._config.general["timestamp"]
-                + ".xlsx",
-            ),
-            index=False,
-        )
+        df.loc[(df.agency_url=="")|(df.agency_url=="Rejoignez nous sur Facebook"), "agency_url"] = np.nan
+        df["agency_url"].fillna(df["agency_url_pj"], inplace=True)
+
+        df["count"] = 0.1
+        df["hyperlink_url"] = ""
+
+        df = df[['count', 'comment', 'is_non-standard', 'is_agency', 'tarif_dispo-web', 'agency_code',
+                 'agency_name', 'agency_address', 'postal_code', 'city', 'price_min',
+                 'agency_rate', 'agency_fee_min_keuros', 'hyperlink_url', 'agency_url',"agency_url_pj", 'telephone',
+                 'image_url', 'num_reviews', 'score', 'services', 'network',
+                 'review_example']]
+
+        # df.to_excel(
+        #     os.path.join(
+        #         "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
+        #         "02_agency_fees",
+        #         "for_filling",
+        #         self._config.general["timestamp"]+"_"
+        #         "for_filling_agencie_fees"
+        #         + ".xlsx",
+        #     ),
+        #     index=False,
+        # )
 
         list_postal_code = df.postal_code.unique()
-        for c in range(0, len(list_postal_code)):
-
+        for c in list_postal_code:
             # Make folder to save outputs if not existed
             if not os.path.exists(
                 os.path.join(
-                    self._cwd,
                     "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
                     "02_agency_fees",
                     "for_filling",
-                    c,
+                    str(c),
                 )
             ):
                 os.makedirs(
                     os.path.join(
-                        self._cwd,
                         "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
                         "02_agency_fees",
                         "for_filling",
-                        c,
+                        str(c),
                     )
                 )
 
@@ -103,14 +115,15 @@ class EtlForFillingAgencyFees(Etl):
                     "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
                     "02_agency_fees",
                     "for_filling",
-                    c,
+                    str(c),
+                    self._config.general["timestamp"]+"_"
                     "for_filling_agencie_fees_"
-                    + c
-                    + "_"
-                    + self._config.general["timestamp"]
+                    + str(c)
+
                     + ".xlsx",
                 ),
                 index=False,
             )
 
         return df
+
