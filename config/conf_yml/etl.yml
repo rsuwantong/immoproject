@@ -34,14 +34,14 @@ raw_data:
     format: csv
     read_kwargs:
       sep: ","
-      usecols: ["agency_name","address","street","postal_code","city"]
+      usecols: ["adresse","Code Postal","Ville","agence_name", "tel_1","agence_url","image_url","nb_avis","note","Prestations","Reseaux","teaser-avis","agences_urls"]
 
   filled_agency_fees:
     location: 02_agency_fees/filled/75002
     filename: 20201011_list_agencies_filled_tb_75002.xlsx
     format: xlsx
     read_kwargs:
-      usecols: ["comment","is_non-standard","is_agency","tarif_dispo-web","agency_code","agency_name","agency_address","postal_code","city","price_min","agency_rate","agency_fee_min_keuros","hyperlink_url", "agency_url"]
+      usecols: ["comment","is_non-standard","is_agency","tarif_dispo-web","agency_code","agency_name","agency_address","postal_code","city","price_min","agency_rate","agency_fee_min_keuros"]
 
 no_update_etls: []
 

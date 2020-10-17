@@ -6,6 +6,8 @@ from helper.cache import Cache
 # Layer 0 (raw data import)
 from data.etl.layer0.etl_agency_master import EtlAgencyMaster
 from data.etl.layer0.etl_filled_agency_fees import EtlFilledAgencyFees
+# Layer 1
+from data.etl.layer1.etl_for_filling_agency_fees import EtlForFillingAgencyFees
 
 class Data(object):
     """
@@ -16,8 +18,9 @@ class Data(object):
     etls_classes = {
         # Layer 0
         "agency_master": EtlAgencyMaster,
-        "filled_agency_fees": EtlFilledAgencyFees
+        "filled_agency_fees": EtlFilledAgencyFees,
         # Layer 1
+        "for_filling_agency_fees": EtlForFillingAgencyFees
     }
 
     def __init__(self, config: ImmoConfig, use_cache: bool = True):
