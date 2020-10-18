@@ -18,7 +18,9 @@ class EtlFilledAgencyFees(Etl):
 
     def _process_raw_data(self, raw_df: pd.DataFrame = None):
         df = raw_df
-        df = df.rename(columns={"agency_url": "agency_url_pj"
-                                })
+        df = df.rename(columns={"agency_url": "agency_url_pj",
+                                "Comment": "comment",
+                                "Is_agency": "is_agency"
+        })
 
         return df

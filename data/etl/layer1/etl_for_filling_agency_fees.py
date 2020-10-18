@@ -27,8 +27,19 @@ class EtlForFillingAgencyFees(Etl):
             self._log.warning(
                 f"There are {num_agencies_duplicated} duplicated agencies in agency master."
             )
-            agencies.loc[(agencies.agency_url == "") | (agencies.agency_url == "Rejoignez nous sur Facebook"), "agency_url"] = np.nan
-            agencies = agencies.sort_values(['agency_name', 'agency_address', 'agency_url', 'agency_url_pj'], ascending=False).groupby(['agency_name', 'agency_address']).head(1)
+            agencies.loc[
+                (agencies.agency_url == "")
+                | (agencies.agency_url == "Rejoignez nous sur Facebook"),
+                "agency_url",
+            ] = np.nan
+            agencies = (
+                agencies.sort_values(
+                    ["agency_name", "agency_address", "agency_url", "agency_url_pj"],
+                    ascending=False,
+                )
+                .groupby(["agency_name", "agency_address"])
+                .head(1)
+            )
 
         self._log.info(f"There are {agencies.shape[0]} agencies in agency master.")
 
@@ -37,7 +48,17 @@ class EtlForFillingAgencyFees(Etl):
             f"There are {fees[['agency_name', 'agency_address']].drop_duplicates().shape[0]} agencies in filled fees."
         )
         # Get information from agency master for fees
-        fees = fees.merge(agencies, on =["agency_name", "agency_address","postal_code","city","agency_url_pj"], how="left")
+        fees = fees.merge(
+            agencies,
+            on=[
+                "agency_name",
+                "agency_address",
+                "postal_code",
+                "city",
+                "agency_url_pj",
+            ],
+            how="left",
+        )
         ## Identify new agencies not in fees
         list_agencies_in_fees = fees[
             ["agency_name", "agency_address"]
@@ -54,9 +75,7 @@ class EtlForFillingAgencyFees(Etl):
 
         new_agencies_info = pd.concat([new_agencies_info] * 10)
 
-        df = fees.merge(
-            new_agencies_info, how="outer"
-        )
+        df = fees.merge(new_agencies_info, how="outer")
         num_agencies_final = (
             df[["agency_name", "agency_address"]].drop_duplicates().shape[0]
         )
@@ -66,25 +85,61 @@ class EtlForFillingAgencyFees(Etl):
         )
 
         # Compute agency_code
-        df_for_agency_code = df[["agency_name", "agency_address","postal_code"]].drop_duplicates()
-        df_for_agency_code["pre_agency_code"] = [str(x).zfill(4) for x in df_for_agency_code.groupby(["postal_code"]).cumcount()+1]
-        df_for_agency_code["agency_code"] = df_for_agency_code["postal_code"].astype(str)+df_for_agency_code["pre_agency_code"]
-        df_for_agency_code.drop(columns=["pre_agency_code","postal_code"], inplace=True)
+        df_for_agency_code = df[
+            ["agency_name", "agency_address", "postal_code"]
+        ].drop_duplicates()
+        df_for_agency_code["pre_agency_code"] = [
+            str(x).zfill(4)
+            for x in df_for_agency_code.groupby(["postal_code"]).cumcount() + 1
+        ]
+        df_for_agency_code["agency_code"] = (
+            df_for_agency_code["postal_code"].astype(str)
+            + df_for_agency_code["pre_agency_code"]
+        )
+        df_for_agency_code.drop(
+            columns=["pre_agency_code", "postal_code"], inplace=True
+        )
 
         # Merge agency_code to main dataframe
         df = df.merge(df_for_agency_code, on=["agency_name", "agency_address"])
 
-        df.loc[(df.agency_url=="")|(df.agency_url=="Rejoignez nous sur Facebook"), "agency_url"] = np.nan
+        df.loc[
+            (df.agency_url == "") | (df.agency_url == "Rejoignez nous sur Facebook"),
+            "agency_url",
+        ] = np.nan
         df["agency_url"].fillna(df["agency_url_pj"], inplace=True)
 
         df["count"] = 0.1
         df["hyperlink_url"] = ""
 
-        df = df[['count', 'comment', 'is_non-standard', 'is_agency', 'tarif_dispo-web', 'agency_code',
-                 'agency_name', 'agency_address', 'postal_code', 'city', 'price_min',
-                 'agency_rate', 'agency_fee_min_keuros', 'hyperlink_url', 'agency_url',"agency_url_pj", 'telephone',
-                 'image_url', 'num_reviews', 'score', 'services', 'network',
-                 'review_example','image_code']]
+        df = df[
+            [
+                "count",
+                "comment",
+                "is_non-standard",
+                "is_agency",
+                "tarif_dispo-web",
+                "agency_code",
+                "agency_name",
+                "agency_address",
+                "postal_code",
+                "city",
+                "price_min",
+                "agency_rate",
+                "agency_fee_min_keuros",
+                "hyperlink_url",
+                "agency_url",
+                "agency_url_pj",
+                "telephone",
+                "image_url",
+                "num_reviews",
+                "score",
+                "services",
+                "network",
+                "review_example",
+                "image_code",
+            ]
+        ]
 
         # df.to_excel(
         #     os.path.join(
@@ -125,14 +180,21 @@ class EtlForFillingAgencyFees(Etl):
                     "02_agency_fees",
                     "for_filling",
                     str(c),
-                    self._config.general["timestamp"]+"_"
-                    "for_filling_agencie_fees_"
-                    + str(c)
-
-                    + ".xlsx",
+                    self._config.general["timestamp"] + "_"
+                    "for_filling_agencie_fees_" + str(c) + ".xlsx",
+                ),
+                index=False,
+            )
+            df_postal_code.to_csv(
+                os.path.join(
+                    "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
+                    "02_agency_fees",
+                    "for_filling",
+                    str(c),
+                    self._config.general["timestamp"] + "_"
+                                                        "for_filling_agencie_fees_" + str(c) + ".csv",
                 ),
                 index=False,
             )
 
         return df
-
