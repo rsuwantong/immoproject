@@ -1,5 +1,5 @@
 import pandas as pd
-import datetime as dt
+import os
 
 from data.etl.etl import Etl
 
@@ -33,5 +33,38 @@ class EtlAgencyMaster(Etl):
                         "url_pj": "agency_url_pj",
                         "agence_id": "image_code"
                         })
+
+        list_postal_code = df.postal_code.unique()
+        for c in list_postal_code:
+            # Make folder to save outputs if not existed
+            if not os.path.exists(
+                    os.path.join(
+                        "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
+                        "02_agency_fees",
+                        "agency_master",
+                        str(c),
+                    )
+            ):
+                os.makedirs(
+                    os.path.join(
+                        "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
+                        "02_agency_fees",
+                        "agency_master",
+                        str(c),
+                    )
+                )
+
+            df_postal_code = df[df.postal_code == c]
+            df_postal_code.to_csv(
+                os.path.join(
+                    "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
+                    "02_agency_fees",
+                    "agency_master",
+                    str(c),
+                    self._config.general["timestamp"] + "_"
+                                                        "agency_master_" + str(c) + ".csv",
+                ),
+                index=False,
+            )
 
         return df

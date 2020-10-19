@@ -185,16 +185,5 @@ class EtlForFillingAgencyFees(Etl):
                 ),
                 index=False,
             )
-            df_postal_code.to_csv(
-                os.path.join(
-                    "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
-                    "02_agency_fees",
-                    "for_filling",
-                    str(c),
-                    self._config.general["timestamp"] + "_"
-                                                        "for_filling_agencie_fees_" + str(c) + ".csv",
-                ),
-                index=False,
-            )
 
         return df
