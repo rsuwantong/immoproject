@@ -61,7 +61,7 @@ class EtlAgencyMaster(Etl):
                     "02_agency_fees",
                     "agency_master",
                     str(c),
-                    self._config.general["timestamp"] + "_"
+                    self._config.general["timestamp"] + "_"+
                                                         "agency_master_" + str(c) + ".csv",
                 ),
                 index=False,
