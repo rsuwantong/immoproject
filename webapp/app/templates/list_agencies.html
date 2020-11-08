@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Here are your agency fees!</h1>
+    {% for agency in agencies %}
+    <div><p>{{ agency.properties.name }}: <b>{{ agency.fee }} €</b></p></div>
+    {% endfor %}
+{% endblock %}

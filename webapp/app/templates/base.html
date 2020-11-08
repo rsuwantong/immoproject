@@ -1,0 +1,17 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }} - Immo Guru</title>
+      {% else %}
+      <title>Welcome to Immo Guru</title>
+      {% endif %}
+    </head>
+    <body>
+        <div>Immo Guru:
+            <a href="/index">Home</a>
+            <a href="/compute_fee">Calculer le frais d'agence</a>
+        </div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>
