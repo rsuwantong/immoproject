@@ -2,6 +2,6 @@
 {% block content %}
     <h1>Here are your agency fees!</h1>
     {% for agency in agencies %}
-    <div><p>{{ agency.properties.name }}: <b>{{ agency.fee }} €</b></p></div>
+    <div><p>{{ agency.agency_name }} at {{ agency.agency_address }} : <b>{{ agency.agency_fee_final }} €</b></p></div>
     {% endfor %}
 {% endblock %}
