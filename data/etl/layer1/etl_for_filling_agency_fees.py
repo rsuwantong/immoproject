@@ -141,17 +141,6 @@ class EtlForFillingAgencyFees(Etl):
             ]
         ]
 
-        # df.to_excel(
-        #     os.path.join(
-        #         "/Users/jacquemart rata/Documents/04_PERSO/Immo/00_data",
-        #         "02_agency_fees",
-        #         "for_filling",
-        #         self._config.general["timestamp"]+"_"
-        #         "for_filling_agencie_fees"
-        #         + ".xlsx",
-        #     ),
-        #     index=False,
-        # )
 
         list_postal_code = df.postal_code.unique()
         for c in list_postal_code:

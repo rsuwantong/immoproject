@@ -17,14 +17,27 @@ class Cache(object):
     Object to manipulate cache
     """
 
-    def __init__(self, config: ImmoConfig, use_cache=True):
-        self._config = config
-        self._log = logging.getLogger(__name__)
-        self._to_prod = self._config.cache["cache_to_prod"]
-        self._from_prod = self._config.cache["cache_from_prod"]
-        self._read_kwargs = self._config.cache["read_kwargs"]
-        self._write_kwargs = self._config.cache["write_kwargs"]
-        self._cache_dict = defaultdict(dict)
+    # There is only one cache instance
+    __instance = None
+    __initialized = False
+
+    # Always return the same instance
+    def __new__(cls, *args, **kwargs):
+        if Cache.__instance is None:
+            Cache.__instance = object.__new__(cls)
+        return Cache.__instance
+
+    def __init__(self, config: ImmoConfig):
+        # Initialize it only once
+        if not Cache.__initialized:
+            Cache.__initialized = True
+            self._config = config
+            self._log = logging.getLogger(__name__)
+            self._to_prod = self._config.cache["cache_to_prod"]
+            self._from_prod = self._config.cache["cache_from_prod"]
+            self._read_kwargs = self._config.cache["read_kwargs"]
+            self._write_kwargs = self._config.cache["write_kwargs"]
+            self._cache_dict = defaultdict(dict)
 
     @property
     def prod_cache_root(self):
