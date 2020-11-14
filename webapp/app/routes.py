@@ -41,7 +41,7 @@ def list_agencies(postal_code, price):
     engine = create_engine("postgresql://postgres:Bohr7411@localhost:5432/immoguru")
     agency_fees = pd.read_sql_query('select * from "agency_fees"', con=engine)
     agency_fees["price_max_keuros"] = agency_fees["price_max_keuros"].fillna(1e9)
-    agency_fees_relevant =agency_fees[
+    agency_fees_relevant = agency_fees[
         (agency_fees.postal_code == postal_code)
         & (agency_fees.price_min_keuros <= price_keuros)
         & (agency_fees.price_max_keuros > price_keuros)
